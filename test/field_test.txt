@@ -1,0 +1,42 @@
+// NCURSES3 51:30
+        FIELD *field[2];
+        FORM *form;
+        // Initialize the fields
+        field[0] = new_field(2, wordsize, 1, 1, 0, 0);
+        field[1] = NULL;
+
+        // Set field options
+        set_field_back(field[0], A_UNDERLINE);
+        field_opts_off(field[0], O_AUTOSKIP);
+
+        // Create the form and post it
+        form = new_form(field);
+        post_form(form);
+        wrefresh(window);
+
+        mvwprintw(window, 1, 1, "Input: ");
+        wrefresh(window);
+
+        int ch;
+        while ((ch = getch()) != 10) {
+                switch (ch) {
+                        case KEY_DOWN :
+                                form_driver(form, REQ_NEXT_FIELD);
+                                form_driver(form, REQ_END_LINE);
+                                break;
+                        case KEY_UP :
+                                form_driver(form, REQ_PREV_FIELD);
+                                form_driver(form, REQ_END_LINE);
+                                break;
+                        default :
+                                form_driver(form, ch);
+                                break;
+                }
+        }
+
+        // Unpost form and free the memory
+        unpost_form(form);
+        free_form(form);
+        free_field(field[0]);
+        free_field(field[1]);
+
